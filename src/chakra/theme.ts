@@ -15,8 +15,10 @@ const theme = extendTheme({
   }, 
   styles: {
     global: () => ({
-        bg: "gray-200"
-    })
+      body: {
+        bg: "gray.200",
+      },
+    }),
   }, 
   components: {
     Button, 

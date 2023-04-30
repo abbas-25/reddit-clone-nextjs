@@ -1,9 +1,18 @@
 import { authModalState } from "@/src/atoms/authModalAtom";
 import { ChevronDownIcon } from "@chakra-ui/icons";
-import { Flex, Icon, Menu, MenuButton, MenuList, Text } from "@chakra-ui/react";
+import {
+  Button,
+  Flex,
+  Icon,
+  Menu,
+  MenuButton,
+  MenuList,
+  Text,
+} from "@chakra-ui/react";
 import React from "react";
 import { useSetRecoilState } from "recoil";
 import { TiHome } from "react-icons/ti";
+import Communities from "./Communities";
 
 const Directory: React.FC = () => {
   return (
@@ -36,7 +45,7 @@ const Directory: React.FC = () => {
         </Flex>
       </MenuButton>
       <MenuList>
-        {/* <Communities /> */}
+        <Communities />
       </MenuList>
     </Menu>
   );

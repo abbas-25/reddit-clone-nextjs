@@ -34,7 +34,7 @@ const Login: React.FC<LoginProps> = () => {
   const setAuthModalState = useSetRecoilState(authModalState);
 
   return (
-    <form>
+    <form onSubmit={onSubmit}>
       <Input
         required
         name="email"
@@ -84,7 +84,6 @@ const Login: React.FC<LoginProps> = () => {
         mt={2}
         mb={2}
         type="submit"
-        onClick={onSubmit}
         isLoading={loading}
       >
         Log In

@@ -47,7 +47,7 @@ const Signup: React.FC<SignupProps> = () => {
   };
 
   return (
-    <form>
+    <form onSubmit={onSubmit}>
       <Input
         required
         name="email"
@@ -108,7 +108,7 @@ const Signup: React.FC<SignupProps> = () => {
      {error && <Text textAlign="center" color="red" fontSize="10pt">{error}</Text>}
      {userError && <Text textAlign="center" color="red" fontSize="10pt">{getFirebaseProcessedError(userError.code)}</Text>}
 
-      <Button width="100%" height="36px" mt={2} mb={2} type="submit" onClick={onSubmit} isLoading={loading}>
+      <Button width="100%" height="36px" mt={2} mb={2} type="submit" isLoading={loading}>
         Sign Up
       </Button>
     </form>

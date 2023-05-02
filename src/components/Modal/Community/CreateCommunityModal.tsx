@@ -21,7 +21,13 @@ import { HiLockClosed } from "react-icons/hi";
 
 import React, { useState } from "react";
 import { auth, firestore } from "@/src/firebase/clientApp";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  runTransaction,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 
 type CreateCommunityModalProps = {
@@ -55,7 +61,7 @@ const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({
   };
 
   const handleCreateCommunity = async () => {
-    if(error) setError("")
+    if (error) setError("");
     // validate community name
     const format = /[ `!@#$%^&*()+\-=\[\]{};':"\\|,.<>\/?~]/;
 
@@ -70,20 +76,31 @@ const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({
 
     try {
       const communityDocRef = doc(firestore, "communities", communityName);
-      
-      // check if name is not taken
-      const communityDoc = await getDoc(communityDocRef);
-      if (communityDoc.exists()) {
-        throw new Error(`Sorry, r/${communityName} is taken! Try another.`);
-      }
 
-      // name is valid + unique
-      // Create community in firestore
-      await setDoc(communityDocRef, {
-        createdId: user?.uid,
-        createdAt: serverTimestamp(),
-        numberOfMembers: 1,
-        privacyType: communityType,
+      await runTransaction(firestore, async (transaction) => {
+        // check if name is not taken
+        const communityDoc = await transaction.get(communityDocRef);
+        if (communityDoc.exists()) {
+          throw new Error(`Sorry, r/${communityName} is taken! Try another.`);
+        }
+
+        // name is valid + unique
+        // Create community in firestore
+        transaction.set(communityDocRef, {
+          createdId: user?.uid,
+          createdAt: serverTimestamp(),
+          numberOfMembers: 1,
+          privacyType: communityType,
+        });
+
+        // create communitySnippet on user
+        transaction.set(
+          doc(firestore, `users/${user?.uid}/communitySnippets`, communityName),
+          {
+            communityId: communityName,
+            isModerator: true,
+          }
+        );
       });
     } catch (error: any) {
       console.log("handleCreateCommunity error", error);
@@ -144,7 +161,11 @@ const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({
               {charsRemaining} Characters remaining
             </Text>
 
-            {error && <Text fontSize="9pt" color="red" pt={1}>{error}</Text>}
+            {error && (
+              <Text fontSize="9pt" color="red" pt={1}>
+                {error}
+              </Text>
+            )}
 
             <Box mt={4} mb={4}>
               <Text fontWeight={600} fontSize={15}>
@@ -214,7 +235,7 @@ const CreateCommunityModal: React.FC<CreateCommunityModalProps> = ({
           </Button>
           <Button
             height="30px"
-            onClick={ handleCreateCommunity }
+            onClick={handleCreateCommunity}
             isLoading={loading}
           >
             Create Community
